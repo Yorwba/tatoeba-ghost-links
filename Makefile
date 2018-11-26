@@ -41,5 +41,8 @@ data/output/original_ghost_links.csv: data/output/ghost_link_redirection.csv
 data/output/fixed_ghost_links.csv: data/output/ghost_link_redirection.csv
 	cut -d' ' -f2,3 $< > $@
 
-data/output/replay.sqlite data/output/replayed_links.csv data/output/replayed_sentences.csv: data/tatoeba/contributions.csv
+data/output/replay.sqlite data/output/replayed_links.csv data/output/replayed_sentences.csv: data/tatoeba/contributions.csv data/output/
 	./replay_contributions.py
+
+data/output/rehydrated.sqlite: data/tatoeba/sentences.csv data/tatoeba/links.csv data/output/
+	./rehydrate.py

@@ -5,7 +5,10 @@ import sqlite3
 
 
 DATABASE = 'data/output/replay.sqlite'
-os.remove(DATABASE)
+try:
+    os.remove(DATABASE)
+except:
+    pass
 conn = sqlite3.connect(DATABASE)
 cur = conn.cursor()
 cur.execute(
