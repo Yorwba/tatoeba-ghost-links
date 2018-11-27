@@ -1,7 +1,7 @@
 .PHONY: all
-.PRECIOUS: *
+.SECONDARY:
 
-all: data/output/original_ghost_links.csv data/output/fixed_ghost_links.csv
+all: data/output/replayed_links_to_restore.csv data/output/replayed_links_to_delete.csv
 
 data/tatoeba/%.tar.bz2:
 	wget --timestamping --directory-prefix=data/tatoeba/ \
@@ -41,8 +41,18 @@ data/output/original_ghost_links.csv: data/output/ghost_link_redirection.csv
 data/output/fixed_ghost_links.csv: data/output/ghost_link_redirection.csv
 	cut -d' ' -f2,3 $< > $@
 
-data/output/replay.sqlite data/output/replayed_links.csv data/output/replayed_sentences.csv: data/tatoeba/contributions.csv data/output/
-	./replay_contributions.py
+data/output/replay.sqlite \
+    data/output/replayed_links_present.csv \
+    data/output/replayed_links_deleted.csv \
+    data/output/replayed_sentences_present.csv \
+    data/output/replayed_sentences_deleted.csv: data/tatoeba/contributions_20181127.csv data/output/
+	./replay_contributions.py $<
+
+data/output/replayed_links_to_delete.csv: data/output/replayed_links_deleted.csv data/tatoeba/links.csv
+	./tupleset.py and $^ > $@
+
+data/output/replayed_links_to_restore.csv: data/output/replayed_links_present.csv data/tatoeba/links.csv
+	./tupleset.py gt $^ > $@
 
 data/output/rehydrated.sqlite: data/tatoeba/sentences.csv data/tatoeba/links.csv data/output/
 	./rehydrate.py
